@@ -7,8 +7,13 @@ from .forms import TopicForm, EntryForm
 
 
 def index(request):
-    """The home page for Learning Log."""
+    """The register page for Learning Log."""
     return render(request, 'learning_logs/index.html')
+
+@login_required
+def home(request):
+    """The home page for Learning Log."""
+    return render(request, 'learning_logs/home.html')
 
 @login_required
 def topics(request):

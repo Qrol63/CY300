@@ -6,8 +6,10 @@ from . import views
 
 app_name = 'learning_logs'
 urlpatterns = [
-    # Home page
+    # Register page
     path('', views.index, name='index'),
+    # Home page
+    path('home/', views.home, name='home'),
     # Page that shows all topics.
     path('topics/', views.topics, name='topics'),
     # Detail page for a single topic.
