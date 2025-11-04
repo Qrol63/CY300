@@ -13,7 +13,9 @@ def index(request):
 @login_required
 def home(request):
     """The home page for Learning Log."""
-    return render(request, 'learning_logs/home.html')
+    topics = Topic.objects.filter(owner=request.user).order_by('text')
+    context = {'topics': topics}
+    return render(request, 'learning_logs/home.html', context)
 
 @login_required
 def topics(request):
