@@ -1,12 +1,12 @@
 {% extends 'learning_logs/base.html' %}
 
 {% block page_header %}
-<div class="p-3 mb-4 bg-light border rounded-3">
-  <div class="container-fluid py-4">
-    <h1 class="display-4">Welcome back, {{ user.username }}!</h1>
-    <p class="lead">Track your habits and build consistency.</p>
+  <div class="p-3 mb-4 bg-light border rounded-3">
+    <div class="container-fluid py-4">
+      <h1 class="display-4">Welcome back, {{ user.username }}!</h1>
+      <p class="lead">Track your habits and build consistency.</p>
+    </div>
   </div>
-</div>
 {% endblock page_header %}
 
 {% block content %}
@@ -18,25 +18,25 @@
     max-width: 1200px;
     margin: 0 auto;
   }
-
+  
   .calendar-container {
     width: 100%;
   }
-
+  
   .calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
   }
-
+  
   .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 10px;
     margin-top: 20px;
   }
-
+  
   .calendar-day-label {
     text-align: center;
     font-weight: bold;
@@ -44,7 +44,7 @@
     background-color: #e9ecef;
     border-radius: 5px;
   }
-
+  
   .calendar-day {
     aspect-ratio: 1;
     border: 2px solid #dee2e6;
@@ -56,29 +56,29 @@
     transition: all 0.2s;
     font-size: 1.1rem;
   }
-
+  
   .calendar-day:hover {
     border-color: #0d6efd;
     background-color: #f8f9fa;
   }
-
+  
   .calendar-day.other-month {
     opacity: 0.3;
     cursor: default;
   }
-
+  
   .calendar-day.today {
     background-color: #0d6efd;
     color: white;
     font-weight: bold;
   }
-
+  
   .calendar-day.has-completed {
     background-color: #198754;
     color: white;
     border-color: #198754;
   }
-
+  
   .month-nav-btn {
     background: none;
     border: none;
@@ -87,11 +87,11 @@
     padding: 5px 15px;
     color: #0d6efd;
   }
-
+  
   .month-nav-btn:hover {
     color: #0a58ca;
   }
-
+  
   .tasks-panel {
     background: white;
     border: 2px solid #dee2e6;
@@ -99,30 +99,30 @@
     padding: 20px;
     height: fit-content;
   }
-
+  
   .tasks-header {
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 2px solid #e9ecef;
   }
-
+  
   .tasks-header h3 {
     margin: 0;
     color: #333;
   }
-
+  
   .selected-date {
     color: #6c757d;
     font-size: 0.9rem;
     margin-top: 5px;
   }
-
+  
   .task-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-
+  
   .task-item {
     display: flex;
     align-items: center;
@@ -132,11 +132,11 @@
     border-radius: 8px;
     transition: background 0.2s;
   }
-
+  
   .task-item:hover {
     background: #e9ecef;
   }
-
+  
   .task-checkbox {
     width: 22px;
     height: 22px;
@@ -149,32 +149,32 @@
     justify-content: center;
     transition: all 0.2s;
   }
-
+  
   .task-checkbox.checked {
     background: #198754;
     border-color: #198754;
   }
-
+  
   .task-checkbox.checked::after {
     content: '✓';
     color: white;
     font-weight: bold;
     font-size: 14px;
   }
-
+  
   .task-name {
     flex: 1;
     color: #333;
     font-size: 1rem;
   }
-
+  
   .no-tasks {
     text-align: center;
     color: #6c757d;
     padding: 30px;
     font-style: italic;
   }
-
+  
   @media (max-width: 992px) {
     .main-container {
       grid-template-columns: 1fr;
@@ -189,26 +189,26 @@
       <h2 id="monthYear"></h2>
       <button class="month-nav-btn" onclick="nextMonth()">→</button>
     </div>
-
+    
     <div class="calendar-grid" id="calendar"></div>
   </div>
-
+  
   <div class="tasks-panel">
     <div class="tasks-header">
       <h3>Tasks</h3>
       <div class="selected-date" id="selectedDate"></div>
     </div>
-
+    
     <div class="task-list" id="taskList">
       {% if topics %}
-      {% for topic in topics %}
-      <div class="task-item" onclick="toggleTaskFromElement(this)">
-        <div class="task-checkbox" data-topic-id="{{ topic.id }}"></div>
-        <div class="task-name">{{ topic.text }}</div>
-      </div>
-      {% endfor %}
+        {% for topic in topics %}
+          <div class="task-item" onclick="toggleTaskFromElement(this)">
+            <div class="task-checkbox" data-topic-id="{{ topic.id }}"></div>
+            <div class="task-name">{{ topic.text }}</div>
+          </div>
+        {% endfor %}
       {% else %}
-      <div class="no-tasks">No topics yet. <a href="{% url 'learning_logs:new_topic' %}">Add one!</a></div>
+        <div class="no-tasks">No topics yet. <a href="{% url 'learning_logs:new_topic' %}">Add one!</a></div>
       {% endif %}
     </div>
   </div>
@@ -217,46 +217,48 @@
 <script>
   let currentDate = new Date();
   let selectedDate = new Date();
-  let completions = {};
-
+  let completions = JSON.parse('{{ completions|escapejs }}');
+  
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'];
   const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   function getDateKey(date) {
-    return date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+    return date.getFullYear() + '-' + 
+           String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+           String(date.getDate()).padStart(2, '0');
   }
 
   function renderCalendar() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-
+    
     document.getElementById('monthYear').textContent = monthNames[month] + ' ' + year;
-
+    
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const daysInPrevMonth = new Date(year, month, 0).getDate();
-
+    
     const calendar = document.getElementById('calendar');
     calendar.innerHTML = '';
-
+    
     for (let i = 0; i < dayLabels.length; i++) {
       const label = document.createElement('div');
       label.className = 'calendar-day-label';
       label.textContent = dayLabels[i];
       calendar.appendChild(label);
     }
-
+    
     for (let i = firstDay - 1; i >= 0; i--) {
       const day = createDayElement(daysInPrevMonth - i, true);
       calendar.appendChild(day);
     }
-
+    
     for (let i = 1; i <= daysInMonth; i++) {
       const day = createDayElement(i, false);
       calendar.appendChild(day);
     }
-
+    
     const remainingDays = 42 - (firstDay + daysInMonth);
     for (let i = 1; i <= remainingDays; i++) {
       const day = createDayElement(i, true);
@@ -268,28 +270,28 @@
     const day = document.createElement('div');
     day.className = 'calendar-day';
     day.textContent = dayNum;
-
+    
     if (isOtherMonth) {
       day.classList.add('other-month');
       return day;
     }
-
+    
     const dateKey = getDateKey(new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNum));
-
+    
     const today = new Date();
-    if (dayNum === today.getDate() &&
-      currentDate.getMonth() === today.getMonth() &&
-      currentDate.getFullYear() === today.getFullYear()) {
+    if (dayNum === today.getDate() && 
+        currentDate.getMonth() === today.getMonth() && 
+        currentDate.getFullYear() === today.getFullYear()) {
       day.classList.add('today');
     }
-
+    
     const totalTasks = document.querySelectorAll('.task-checkbox').length;
     if (completions[dateKey] && completions[dateKey].length === totalTasks && totalTasks > 0) {
       day.classList.add('has-completed');
     }
-
-    day.onclick = function () { selectDate(dayNum); };
-
+    
+    day.onclick = function() { selectDate(dayNum); };
+    
     return day;
   }
 
@@ -308,9 +310,9 @@
   function updateTaskCheckboxes() {
     const dateKey = getDateKey(selectedDate);
     const completedToday = completions[dateKey] || [];
-
+    
     const checkboxes = document.querySelectorAll('.task-checkbox');
-    checkboxes.forEach(function (checkbox) {
+    checkboxes.forEach(function(checkbox) {
       const topicId = parseInt(checkbox.getAttribute('data-topic-id'));
       if (completedToday.indexOf(topicId) > -1) {
         checkbox.classList.add('checked');
@@ -320,25 +322,64 @@
     });
   }
 
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
   function toggleTaskFromElement(element) {
     const checkbox = element.querySelector('.task-checkbox');
     const topicId = parseInt(checkbox.getAttribute('data-topic-id'));
-
+    
     const dateKey = getDateKey(selectedDate);
-
-    if (!completions[dateKey]) {
-      completions[dateKey] = [];
-    }
-
-    const index = completions[dateKey].indexOf(topicId);
-    if (index > -1) {
-      completions[dateKey].splice(index, 1);
-    } else {
-      completions[dateKey].push(topicId);
-    }
-
-    updateTaskCheckboxes();
-    renderCalendar();
+    const dateStr = selectedDate.getFullYear() + '-' + 
+                    String(selectedDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(selectedDate.getDate()).padStart(2, '0');
+    
+    const csrftoken = getCookie('csrftoken');
+    
+    // Send to server
+    fetch('{% url "learning_logs:toggle_task" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({
+        topic_id: topicId,
+        date: dateStr
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Update local completions
+        if (!completions[dateKey]) {
+          completions[dateKey] = [];
+        }
+        
+        const index = completions[dateKey].indexOf(topicId);
+        if (index > -1) {
+          completions[dateKey].splice(index, 1);
+        } else {
+          completions[dateKey].push(topicId);
+        }
+        
+        updateTaskCheckboxes();
+        renderCalendar();
+      }
+    })
+    .catch(error => console.error('Error:', error));
   }
 
   function previousMonth() {

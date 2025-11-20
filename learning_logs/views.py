@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, JsonResponse
+from django.views.decorators.http import require_POST
+import json
+from datetime import datetime 
 
-from .models import Topic, Entry
+from .models import Topic, Entry, TaskCompletion
 from .forms import TopicForm, EntryForm
 
 
@@ -14,7 +17,14 @@ def index(request):
 def home(request):
     """The home page for Learning Log."""
     topics = Topic.objects.filter(owner=request.user).order_by('text')
-    context = {'topics': topics}
+    completions = TaskCompletion.objects.filter(user=request.user)
+    completions_dict = {}
+    for completion in completions:
+        date_key = completion.date.strftime('%Y-%m-%d')
+        if date_key not in completions_dict:
+            completions_dict[date_key] = []
+        completions_dict[date_key].append(completion.topic.id)
+    context = {'topics': topics,'completions':json.dumps(completions_dict)}
     return render(request, 'learning_logs/home.html', context)
 
 @login_required
@@ -96,3 +106,31 @@ def edit_entry(request, entry_id):
 
     context = {'entry': entry, 'topic': topic, 'form': form}
     return render(request, 'learning_logs/edit_entry.html', context)
+
+@login_required
+@require_POST
+def toggle_task(request):
+    data = json.loads(request.body)
+    topic_id = data.get('topic_id')
+    date_str = data.get('date')
+    
+    topic = Topic.objects.get(id=topic_id, owner=request.user)
+    date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    
+    completion = TaskCompletion.objects.filter(
+        user=request.user,
+        topic=topic,
+        date=date
+    ).first()
+    
+    if completion:
+        completion.delete()
+        completed = False
+    else:
+        TaskCompletion.objects.create(
+            user=request.user,
+            topic=topic,
+            date=date
+        )
+        completed = True
+    return JsonResponse({'success':True,'completed':completed})

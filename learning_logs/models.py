@@ -25,3 +25,14 @@ class Entry(models.Model):
     def __str__(self):
         """Return a simple string representing the entry."""
         return f"{self.text[:50]}..."
+    
+class TaskCompletion(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    date = models.DateField()
+    
+    class Meta:
+        unique_together=['user','topic','date']
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.topic.text} - {self.date}"
