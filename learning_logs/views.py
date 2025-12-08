@@ -4,9 +4,11 @@ from django.http import Http404, JsonResponse
 from django.views.decorators.http import require_POST
 import json
 from datetime import datetime 
+from datetime import date
 
 from .models import Topic, Entry, TaskCompletion
 from .forms import TopicForm, EntryForm
+from .stats import day_completion, month_completion
 
 
 def index(request):
@@ -15,16 +17,45 @@ def index(request):
 
 @login_required
 def home(request):
+    user = request.user
     """The home page for Learning Log."""
-    topics = Topic.objects.filter(owner=request.user).order_by('text')
-    completions = TaskCompletion.objects.filter(user=request.user)
-    completions_dict = {}
+    topics = Topic.objects.filter(owner=user).order_by('text')
+
+    today = date.today()
+    year = today.year
+    month = today.month
+
+    habits = {}
+
+    from calendar import monthrange
+    days_in_month = monthrange(year, month)[1]
+
+    for day in range(1, days_in_month + 1):
+        d = date(year, month, day)
+        key = d.strftime("%Y-%m-%d")
+        habits[key] = [t.id for t in topics]
+
+    completions = TaskCompletion.objects.filter(user=user)
+    completed = {}
     for completion in completions:
         date_key = completion.date.strftime('%Y-%m-%d')
-        if date_key not in completions_dict:
-            completions_dict[date_key] = []
-        completions_dict[date_key].append(completion.topic.id)
-    context = {'topics': topics,'completions':json.dumps(completions_dict)}
+        if date_key not in completed:
+            completed[date_key] = []
+        completed[date_key].append(completion.topic.id)
+
+
+    today_str = today.strftime("%Y-%m-%d")
+    month_str = today.strftime("%Y-%m")
+
+    day_stats = day_completion(today_str, habits, completed)
+    month_stats = month_completion(month_str, habits, completed)
+
+    context = {
+        'topics': topics,
+        'completions': json.dumps(completed), 
+        'day_stats': day_stats,
+        'month_stats': month_stats,
+    }
     return render(request, 'learning_logs/home.html', context)
 
 @login_required
