@@ -50,20 +50,28 @@ def topic(request, topic_id):
 def new_topic(request):
     """Add a new topic."""
     if request.method != 'POST':
-        # No data submitted; create a blank form.
         form = TopicForm()
     else:
-        # POST data submitted; process data.
         form = TopicForm(data=request.POST)
         if form.is_valid():
             new_topic = form.save(commit=False)
             new_topic.owner = request.user
+
+            # These names MUST match the model field names above
+            new_topic.monday = True if request.POST.get('monday') else False
+            new_topic.tuesday = True if request.POST.get('tuesday') else False
+            new_topic.wednesday = True if request.POST.get('wednesday') else False
+            new_topic.thursday = True if request.POST.get('thursday') else False
+            new_topic.friday = True if request.POST.get('friday') else False
+            new_topic.saturday = True if request.POST.get('saturday') else False
+            new_topic.sunday = True if request.POST.get('sunday') else False
+
             new_topic.save()
             return redirect('learning_logs:topics')
 
-    # Display a blank or invalid form.
     context = {'form': form}
     return render(request, 'learning_logs/new_topic.html', context)
+
 
 @login_required    
 def new_entry(request, topic_id):
