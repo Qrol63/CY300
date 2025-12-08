@@ -1,5 +1,5 @@
 import pytest
-from learning_logs.completion import day_completion, month_completion #(ChatGPT, 2025)
+from learning_logs.stats import day_completion, month_completion #(ChatGPT, 2025)
 
 def test_day_completion():
     habits = {"2025-01-08": ["Run", "Study"], "2025-01-09": ["Clean"]}
