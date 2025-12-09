@@ -203,7 +203,7 @@
       <p>{{ day_stats }}</p>
       <p>{{ month_stats }}</p>
     </div>
-    
+
     <div class="task-list" id="taskList">
       {% if topics %}
         {% for topic in topics %}
@@ -249,6 +249,43 @@
       String(date.getDate()).padStart(2, '0')
     );
   }
+
+    function updateStats() {
+    const statsContainer = document.querySelector('.habit-stats');
+    if (!statsContainer) return;
+
+    const dayP = statsContainer.querySelector('p:nth-child(1)');
+    const monthP = statsContainer.querySelector('p:nth-child(2)');
+    if (!dayP || !monthP) return;
+
+    // Total number of habits (topics)
+    const totalTopics = document.querySelectorAll('.task-checkbox').length;
+
+    // --- Daily stats: based on TODAY ---
+    const today = new Date();
+    const todayKey = getDateKey(today);
+    const completedToday = (completions[todayKey] || []).length;
+
+    dayP.textContent = `Today: ${completedToday} out of ${totalTopics} habits completed.`;
+
+    // --- Monthly stats: based on THIS MONTH (today's month) ---
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const monthPrefix = year + '-' + String(month).padStart(2, '0');
+
+    let completedThisMonth = 0;
+    for (const key in completions) {
+      if (key.startsWith(monthPrefix)) {
+        completedThisMonth += completions[key].length;
+      }
+    }
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const totalPossible = totalTopics * daysInMonth;
+
+    monthP.textContent = `This Month: ${completedThisMonth} out of ${totalPossible} habits completed.`;
+  }
+
 
   function renderCalendar() {
     const year = currentDate.getFullYear();
@@ -442,6 +479,7 @@
         
         updateTaskCheckboxes();
         renderCalendar();
+        updateStats();
       }
     })
     .catch(error => console.error('Error:', error));
@@ -472,5 +510,6 @@
   updateSelectedDateDisplay();
   renderCalendar();
   updateTaskCheckboxes();
+  updateStats();
 </script>
 {% endblock content %}
