@@ -13,8 +13,8 @@ This website application allows user to do the following things:
 
 ## Files
 
-- accounts: files regarding registration screen and logging in.
-- learning_logs: files regarding the homepage and applications for adding tasks/habits. 
+- register_login: Folder with files regarding registration screen and logging in.
+- account_homepage: Folder with files regarding the homepage and applications for adding tasks/habits. 
 - ll_project: Django configurations
 - venv: file regarding virtual environment, does not have main website code inside.
 
