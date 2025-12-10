@@ -1,0 +1,38 @@
+{% extends 'account_homepage/base.html' %}
+
+{% block content %}
+  <h2>Add a new topic</h2>
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <div class="mb-3">
+      <label class="form-label">Select Days:</label>
+      <div class="btn-group" role="group">
+        <input type="checkbox" class="btn-check" name="monday" id="monday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="monday">Mon</label>
+        
+        <input type="checkbox" class="btn-check" name="tuesday" id="tuesday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="tuesday">Tue</label>
+        
+        <input type="checkbox" class="btn-check" name="wednesday" id="wednesday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="wednesday">Wed</label>
+        
+        <input type="checkbox" class="btn-check" name="thursday" id="thursday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="thursday">Thu</label>
+        
+        <input type="checkbox" class="btn-check" name="friday" id="friday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="friday">Fri</label>
+        
+        <input type="checkbox" class="btn-check" name="saturday" id="saturday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="saturday">Sat</label>
+        
+        <input type="checkbox" class="btn-check" name="sunday" id="sunday" autocomplete="off">
+        <label class="btn btn-outline-primary" for="sunday">Sun</label>
+      </div>
+    </div>
+    
+    <button name="submit" class="btn btn-primary">Add Topic</button>
+  </form>
+{% endblock content %}
